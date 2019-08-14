@@ -1,7 +1,7 @@
 <?php
 
 //root path
-define('BP', __DIR__ . '/');
+define('BP', dirname(dirname(__FILE__)) . '/' );
 
 //enabling displaying php errors
 error_reporting(E_ALL);

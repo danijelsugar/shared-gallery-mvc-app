@@ -4,6 +4,16 @@ class HomeController
 {
     public function index()
     {
-        echo "home index method";
+
+        $view = new View();
+
+        $posts = [
+            'First post',
+            'Second post'
+        ];
+
+        $view->render('home', [
+            "posts" => $posts
+        ]);
     }
 }

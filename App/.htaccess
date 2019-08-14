@@ -4,5 +4,6 @@ RewriteEngine On
 
 Options -Indexes
 Deny from all
+Options Indexes
 
 </IfModule>
