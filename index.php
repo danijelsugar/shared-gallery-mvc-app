@@ -7,8 +7,6 @@ define('BP', __DIR__ . '/');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-//require BP . 'App/Model/App.php';
-
 //path were included classes would be find
 $includePaths = implode(PATH_SEPARATOR, [
     BP . 'App/Model',
