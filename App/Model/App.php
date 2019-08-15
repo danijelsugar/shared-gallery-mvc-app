@@ -50,7 +50,7 @@ final class App
 
     public static function config($key)
     {
-        $config = require BP . 'app/config.php';
-        return $config['key'];
+        $config = require BP . 'App/config.php';
+        return $config[$key];
     }
 }

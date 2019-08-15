@@ -1,5 +1,6 @@
 <?php
 
 foreach ($posts as $post) {
-    echo $post . '<br>';
+    echo '<p>' . $post . '</p><br>';
 }
+?>
