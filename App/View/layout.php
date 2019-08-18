@@ -17,9 +17,17 @@
             </li>
         </ul>
     </nav>
-        
+    <?php 
+        $messages = Session::getInstance()->getMessage();
+    ?>    
     <div class="container">
-        
+        <?php if (isset($messages)): ?>
+            <?php foreach ($messages as $message): ?>
+                <div class="alert alert-<?php echo $message['type'] ?> text-center" role="alert">
+                    <?php echo $message['body'] ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
         <div class="row">
             <?php echo $content; ?>
         </div>
