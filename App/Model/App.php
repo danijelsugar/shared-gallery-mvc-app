@@ -28,7 +28,7 @@ final class App
         }
 
         //resolves param
-        if (!isset($pathParts[2]) || emty($pathParts)) {
+        if (!isset($pathParts[2]) || empty($pathParts)) {
             $param = 0;
         } else {
             $param = $pathParts[2];
@@ -42,7 +42,7 @@ final class App
                 $controllerInstance->$action();
             }
         } else {
-            //header("HTTP/1.0 404 Not Found");
+            header("HTTP/1.0 404 Not Found");
         }
 
 
