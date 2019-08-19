@@ -16,6 +16,25 @@ class Session
         return self::$instance;
     }
 
+    public function login($user)
+    {
+        $_SESSION['is_logged_in'] = $user;
+    }
+
+    public function isLoggedIn()
+    {
+        return isset($_SESSION['is_logged_in']) ? true : false;
+    }
+
+    public function logout()
+    {
+        unset($_SESSION['is_logged_in']);
+    }
+
+    /**
+     * @param $message
+     * @param $type;
+     */
     public function addMessage($message, $type = 'success')
     {
         if (!isset($_SESSION['flashMessage'])) {
@@ -27,6 +46,9 @@ class Session
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getMessage()
     {
         if (isset($_SESSION['flashMessage'])) {
