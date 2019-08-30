@@ -10,6 +10,9 @@ class View
         $this->layout = basename($layout);
     }
 
+    /**
+     * renders page
+     */
     public function render($name, $args = [])
     {
         ob_start();

@@ -8,6 +8,10 @@ class Session
         session_start();
     }
 
+    /**returns session instance if exists if not creates new one and returns it
+     * 
+     * @return $instance
+     */
     public static function getInstance()
     {
         if (!isset(self::$instance)) {
@@ -16,16 +20,27 @@ class Session
         return self::$instance;
     }
 
+    /**
+     * store authorized user data in session so it can be accessed throughout the app
+     */
     public function login($user)
     {
         $_SESSION['is_logged_in'] = $user;
     }
 
+    /**
+     * if user is logged in returns true, if not returns false
+     * 
+     * @return boolean
+     */
     public function isLoggedIn()
     {
         return isset($_SESSION['is_logged_in']) ? true : false;
     }
 
+    /**
+     * unset user data from session and logging him of
+     */
     public function logout()
     {
         unset($_SESSION['is_logged_in']);
@@ -47,6 +62,9 @@ class Session
     }
 
     /**
+     * returns array of messages and unsets them after they are displayed, 
+     * so they are displayed once and when user refreshes page they wont display again
+     * 
      * @return array
      */
     public function getMessage()

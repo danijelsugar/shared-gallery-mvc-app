@@ -10,6 +10,7 @@ ini_set('display_errors', 1);
 //path were included classes would be find
 $includePaths = implode(PATH_SEPARATOR, [
     BP . 'App/Model',
+    BP . 'App/Model/Entity',
     BP . 'App/Controller'
 ]);
 
@@ -21,9 +22,11 @@ spl_autoload_register(function($class)
 
     $classPath = strtr($class, '\\', DIRECTORY_SEPARATOR) . '.php';
 
-    if(file_exists(BP . 'App/Model/' . $classPath) || file_exists(BP . 'App/Controller/' . $classPath)) {
-        return include $classPath;
+    if($file = stream_resolve_include_path($classPath)) {
+        include $file;
+        return true;
     }
+    return false;
 
 });
 

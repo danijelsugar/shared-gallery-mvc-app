@@ -15,6 +15,11 @@ class Db extends PDO
         $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
     }
 
+    /**
+     * returns Db instance if exists if not makes new one and returns it 
+     * 
+     * @return $instance
+     */
     public static function connect()
     {
         $config = App::config('db');

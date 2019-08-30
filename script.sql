@@ -19,4 +19,13 @@ user int not null,
 name varchar(100) not null
 )engine=InnoDB;
 
+create table token_auth (
+id int not null primary key auto_increment,
+user int not null,
+passwordHash varchar(100) not null,
+selectorHash varchar(100) not null,
+isExpired boolean not null default 0,
+expiryDate timestamp not null default current_timestamp on update current_timestamp
+)engine=InnoDB;
+
 alter table images add foreign key (user) references user(id);

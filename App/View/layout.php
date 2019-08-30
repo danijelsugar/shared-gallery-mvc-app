@@ -12,9 +12,15 @@
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo App::config('url'); ?>">Home</a>
             </li>
+            <?php if (Session::getInstance()->isLoggedIn()): ?>
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo App::config('url') ?>login/logout">Logout</a>
+            </li>
+            <?php else: ?>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo App::config('url') ?>login">Login</a>
             </li>
+            <?php endif; ?>
         </ul>
     </nav>
     <?php 

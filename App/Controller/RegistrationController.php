@@ -2,12 +2,21 @@
 
 class RegistrationController
 {
+    /**
+     * renders registration page
+     */
     public function index()
     {
         $view = new View();
-        $view->render('registration');
+        $view->render('registration', [
+            'data' => $_POST
+        ]);
     }
 
+    /**
+     * handles user registration and redirects to home page on success and if failed redirects
+     * to registration page with appropriate message
+     */
     public function register()
     {
 
@@ -35,6 +44,7 @@ class RegistrationController
         }
 
         if ($rpassword === '') {
+            $valid = false;
             Session::getInstance()->addMessage('Repeat password required', 'warning');
         }
 
@@ -54,15 +64,14 @@ class RegistrationController
             $stmt->bindValue('password', password_hash($password, PASSWORD_BCRYPT));
             if ($stmt->execute()) {
                 Session::getInstance()->addMessage('You registered successfuly', 'success');
+                header("Location: " . App::config('url') . 'login');
             } else {
                 Session::getInstance()->addMessage('Something went wrong try again', 'info');
+                header("Location: " . App::config('url') . 'registration');
             }
-            header("Location: " . App::config('url') . 'home');
         } else {
             header("Location: " . App::config('url') . 'registration');
+            
         }
-
-        
-        
     }
 }

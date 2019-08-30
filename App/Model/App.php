@@ -48,6 +48,12 @@ final class App
 
     }
 
+    /**
+     * App configuration
+     * 
+     * @param string
+     * @return array|string
+     */
     public static function config($key)
     {
         $config = require BP . 'App/config.php';
