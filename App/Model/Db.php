@@ -7,12 +7,19 @@ class Db extends PDO
 
     private function __construct($config)
     {
-        $dsn = 'mysql:host='.$config['host'].';dbname='.$config['name'].';charset=utf8';
 
-        parent::__construct($dsn, $config['user'], $config['password']);
+        try {
+            $dsn = 'mysql:host='.$config['host'].';dbname='.$config['name'].';charset=utf8';
 
-        $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+            parent::__construct($dsn, $config['user'], $config['password']);
+    
+            $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+        } catch (PDOException $e) {
+            Session::getInstance()->addMessage('Something went wrong please try again', 'warning');
+            header('Location: ' . App::config('url'));
+        }
+       
     }
 
     /**
