@@ -2,69 +2,56 @@
 
 class Token
 {
-    private $id;
+    
+    protected $db;
 
-    private $user;
-
-    private $passwordHash;
-
-    private $selectorHash;
-
-    private $isExpired;
-
-    private $expiryDate;
-
-    public function __construct($id, $user, $passwordHash, $selectorHash, $isExpired, $expiryDate)
+    public function __construct(Db $db)
     {
-        $this->setId($id);
-        $this->setUser($user);
-        $this->setPasswordHash($passwordHash);
-        $this->setSelectorHash($selectorHash);
-        $this->setIsExpired($isExpired);
-        $this->setExpiryDate($expiryDate);
-    }
-
-    public function __set($name, $value)
-    {
-        $this->$name = $value;
-    }
-
-    public function __get($name)
-    {
-        return isset($this->$name) ? $this->$name : null;
-    }
-
-    public function __call($name, $arguments)
-    {
-        $function = substr($name, 0, 3);
-        if ($function === 'set') {
-            $this->__set(strtolower(substr($name, 3)), $arguments[0]);
-            return $this;
-        } elseif ($function === 'get') {
-            return $this->__get(strtolower(substr($name, 3)));
-        }
-        return $this;
+        $this->db = $db;
     }
 
     /**
-     * @param int 
+     * @param string User id 
      * @param boolean
      */
-    public static function getTokenByUserId($id, $expired)
+    public function getTokenByUserId($id, $expired)
     {
         $id = intval($id);
-        $db = Db::connect();
+        $db = $this->db;
         $stmt = $db->prepare('select * from token_auth where user=:id and isExpired=:isExpired');
         $stmt->bindValue('id', $id); 
         $stmt->bindValue('isExpired', $expired);
         $stmt->execute();
-        $token = $stmt->fetchAll();
         
-        if (!empty($token)) {
-            return new Token($token[0]->id, $token[0]->user, $token[0]->passwordHash, $token[0]->selectorHash, $token[0]->isExpired, $token[0]->expiryDate);
-        } else {
-            return null;
-        }
+        $token = $stmt->fetch();
         
+        return $token;
+        
+    }
+
+    /**
+     * @param string Token id
+     */
+    public function setTokenExpired($tokenId)
+    {
+        $tokenId = intval($tokenId);
+        $db = $this->db;
+        $stmt = $db->prepare('UPDATE token_auth SET isExpired=:isExpired WHERE id=:tokenId');
+        $stmt->bindValue('isExpired', 1);
+        $stmt->bindValue('tokenId', $tokenId);
+        $stmt->execute();
+    }
+
+    public function insertNewToken($userId, $randomPasswordHash, $randomSelectorHash, $expiryDate)
+    {
+        $userId = intval($userId);
+        $db = $this->db;
+        $stmt = $db->prepare('INSERT INTO token_auth (user,passwordHash,selectorHash,expiryDate) 
+                            VALUES (:user,:passwordHash,:selectorHash,:expiryDate)');
+        $stmt->bindValue('user', $userId);
+        $stmt->bindValue('passwordHash', $randomPasswordHash);
+        $stmt->bindValue('selectorHash', $randomSelectorHash);
+        $stmt->bindValue('expiryDate', $expiryDate);
+        $stmt->execute();
     }
 }

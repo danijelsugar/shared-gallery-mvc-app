@@ -20,99 +20,58 @@ class LoginController
      */
     public function authorize()
     {
-        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-        $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-        $valid = true;
 
-        if ($email === '') {
-            $valid = false;
-            Session::getInstance()->addMessage('Email required', 'warning');
-        }
-
-        if ($password === '') {
-            $valid = false;
-            Session::getInstance()->addMessage('Password required', 'warning');
-        }
-
-        if ($valid) {
-            $db = Db::connect();
-            $stmt = $db->prepare('select * from user where email=:email');
-            $stmt->bindValue('email', $email);
-            $stmt->execute();
-
-            if ($stmt->rowCount() > 0) {
-                $user = $stmt->fetch();
-
-                if (password_verify($password, $user->password)) {
-                    unset($user->password);
-                    Session::getInstance()->login($user);
-                    Session::getInstance()->addMessage('You have successfully logged in', 'success');
-
-                    if (isset($_POST['remember'])) {
-                    
-                        // Get Current date, time
-                        $currentTime = time();
-
-                        // Set Cookie expiration for 1 month
-                        $cookieExpirationTime = $currentTime + (30 * 24 * 60 * 60); // for 1 month
-                        
-                        setcookie('user_login', $user->id, $cookieExpirationTime, '/');
-
-                        $randomPassword = $this->getToken(16);
-                        setcookie('random_password', $randomPassword, $cookieExpirationTime, '/');
-
-                        $randomSelector = $this->getToken(32);
-                        setcookie('random_selector', $randomSelector, $cookieExpirationTime,'/');
-
-                        $randomPasswordHash = password_hash($randomPassword, PASSWORD_DEFAULT);
-                        $randomSelectorHash = password_hash($randomSelector, PASSWORD_DEFAULT);
-
-                        $expiryDate = date('Y-m-d H:i:s', $cookieExpirationTime);
-                        
-                        $userToken = Token::getTokenByUserId($user->id, 0);
-                        if(!empty($userToken)) {
-                            $db = Db::connect();
-                            $stmt = $db->prepare('update token_auth set isExpired=:isExpired where id=:tokenId');
-                            $stmt->bindValue('isExpired', 1);
-                            $stmt->bindValue('tokenId', $userToken->id);
-                            $stmt->execute();
-                        }
-                        //insert new token
-                        $db = Db::connect();
-                        $stmt = $db->prepare('insert into token_auth (user,passwordHash,selectorHash,expiryDate) 
-                                            values (:user,:passwordHash,:selectorHash,:expiryDate)');
-                        $stmt->bindValue('user', $user->id);
-                        $stmt->bindValue('passwordHash', $randomPasswordHash);
-                        $stmt->bindValue('selectorHash', $randomSelectorHash);
-                        $stmt->bindValue('expiryDate', $expiryDate);
-                        $stmt->execute();
-
-                    } else {
-                        
-                        //if user login without remember me checked unset cookies
-                        if(isset($_COOKIE['user_login'])) {
-                            setcookie('user_login', '', '-1', '/');
-                        }
-                        if(isset($_COOKIE['random_password'])) {
-                            setcookie('random_password', '', '-1', '/');
-                        }
-                        if(isset($_COOKIE['random_selector'])) {
-                            setcookie('random_selector', '', '-1', '/');
-                        }
-                    }
-
-                    header('Location: ' . App::config('url'));
-                } else {
-                    Session::getInstance()->addMessage('Incorrect combination of email/password', 'warning');
-                    $this->index();
-                }
-            } else {
-                Session::getInstance()->addMessage('Wrong mail', 'warning');
-                $this->index();
-            }
+        if (!isset($_POST['login'])) {
+            Session::getInstance()->addMessage('Something went wrong try again', 'warning');
+            $this->index();
         } else {
-            header('Location: ' . App::config('url') . 'login');
+            $user = new User(Db::connect());
+            $user = $user->authenticate($_POST['email'], $_POST['password']);
+            
+            if (!$user) {
+                Session::getInstance()->addMessage('Incorrect combination of email/password', 'warning');
+                $this->index();
+            } else {
+                unset($user->password);
+                Session::getInstance()->login($user);
+                Session::getInstance()->addMessage('You have successfully logged in', 'success');
+
+                if (isset($_POST['remember'])) {
+                    // Get Current date, time
+                    $currentTime = time();
+
+                    // Set Cookie expiration for 1 month
+                    $cookieExpirationTime = $currentTime + (30 * 24 * 60 * 60); // for 1 month
+                    
+                    setcookie('user_login', $user->id, $cookieExpirationTime, '/');
+
+                    $randomPassword = $this->getToken(16);
+                    setcookie('random_password', $randomPassword, $cookieExpirationTime, '/');
+
+                    $randomSelector = $this->getToken(32);
+                    setcookie('random_selector', $randomSelector, $cookieExpirationTime,'/');
+
+                    $randomPasswordHash = password_hash($randomPassword, PASSWORD_DEFAULT);
+                    $randomSelectorHash = password_hash($randomSelector, PASSWORD_DEFAULT);
+
+                    $expiryDate = date('Y-m-d H:i:s', $cookieExpirationTime);
+                    
+                    $token = new Token(Db::connect());
+                    $userToken = $token->getTokenByUserId($user->id, 0);
+
+                    if(!empty($userToken)) {
+                        $setTokenExpired = $token->setTokenExpired($userToken->id);
+                    }
+                    $newToken = $token->insertNewToken($user->id, $randomPasswordHash, $randomSelectorHash, $expiryDate);
+                } else {
+                     //if user login without remember me checked unset cookies
+                     $this->unsetRememberMeCookies();
+                }
+                header('Location: ' . App::config('url'));
+            }
+            
         }
+        
     }
 
     /**
@@ -120,12 +79,28 @@ class LoginController
      */
     public function logout()
     {
+        $this->unsetRememberMeCookies();
         Session::getInstance()->logout();
         Session::getInstance()->addMessage('You have successfully logged out', 'success');
         header('Location: ' . App::config('url'));
     }
 
-    public function getToken($length)
+    protected function unsetRememberMeCookies()
+    {
+        if(isset($_COOKIE['user_login'])) {
+            setcookie('user_login', '', '-1', '/');
+        }
+
+        if(isset($_COOKIE['random_password'])) {
+            setcookie('random_password', '', '-1', '/');
+        }
+
+        if(isset($_COOKIE['random_selector'])) {
+            setcookie('random_selector', '', '-1', '/');
+        }
+    }
+
+    protected function getToken($length)
     {
         $token = "";
         $codeAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -138,7 +113,7 @@ class LoginController
         return $token;
     }
 
-    public function cryptoRandSecure($min, $max)
+    protected function cryptoRandSecure($min, $max)
     {
         $range = $max - $min;
         if ($range < 1) {
