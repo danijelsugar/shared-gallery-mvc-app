@@ -12,7 +12,13 @@
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo App::config('url'); ?>">Home</a>
             </li>
-            <?php if (Session::getInstance()->isLoggedIn()): ?>
+            <?php if (Session::getInstance()->isLoggedIn() || Session::getInstance()->cookieLoggin()): ?>
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo App::config('url') ?>management">Management</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo App::config('url') ?>account">My account</a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?php echo App::config('url') ?>login/logout">Logout</a>
             </li>
