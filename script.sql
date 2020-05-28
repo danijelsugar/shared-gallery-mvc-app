@@ -4,10 +4,11 @@ use shared_gallery;
 
 create table user (
 id int not null primary key auto_increment,
-firstname varchar(50),
-lastname varchar(50),
-username varchar(50) not null,
+firstName varchar(50),
+lastName varchar(50),
+userName varchar(50) not null,
 email varchar(100) not null,
+address varchar(100) not null,
 password char(60) not null
 )engine=InnoDB;
 
@@ -16,7 +17,8 @@ create unique index unique_email on user(email);
 create table images (
 id int not null primary key auto_increment,
 user int not null,
-name varchar(100) not null
+name varchar(100) not null,
+imgLocation varchar(100) not null
 )engine=InnoDB;
 
 create table token_auth (

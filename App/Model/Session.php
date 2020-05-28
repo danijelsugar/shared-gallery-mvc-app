@@ -39,6 +39,15 @@ class Session
     }
 
     /**
+     * returns logged in user object from session
+     * 
+     * @return object
+     */
+    public  function getUser(){
+        return isset($_SESSION['is_logged_in']) ? $_SESSION['is_logged_in'] : false;
+     }
+
+    /**
      * unset user data from session and logging him of
      */
     public function logout()
@@ -59,7 +68,8 @@ class Session
             $isExpiryDateVerified = false;
 
             //Get token from id
-            $userToken = new Token(Db::connect());
+            $db = Db::connect();
+            $userToken = new Token($db);
             $userToken = $userToken->getTokenByUserId($_COOKIE['user_login'],0);
 
             //validate random_password
