@@ -20,15 +20,16 @@ class RegistrationController
     public function register()
     {
 
-        $firstName = isset($_POST['firstname']) ? trim($_POST['firstName']) : '';
+        $firstName = isset($_POST['firstName']) ? trim($_POST['firstName']) : '';
         $lastName = isset($_POST['lastName']) ? trim($_POST['lastName']) : '';
-        $username = isset($_POST['username']) ? trim($_POST['username']) : '';
+        $userName = isset($_POST['username']) ? trim($_POST['username']) : '';
         $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+        $address = isset($_POST['address']) ? trim($_POST['address']) : '';
         $password = isset($_POST['password']) ?  trim($_POST['password']) : '';
         $rpassword = isset($_POST['rpassword']) ? trim($_POST['rpassword']) : '';
         $valid = true;
 
-        if ($username === '') {
+        if ($userName === '') {
             $valid = false;
             Session::getInstance()->addMessage('Username required', 'warning');
         }
@@ -36,6 +37,11 @@ class RegistrationController
         if ($email === '') {
             $valid = false;
             Session::getInstance()->addMessage('Email required', 'warning');
+        }
+
+        if ($address === '') {
+            $valid = false;
+            Session::getInstance()->addMessage('Address required', 'warning');
         }
 
         if ($password === '') {
@@ -55,23 +61,17 @@ class RegistrationController
 
         if ($valid) {
             $db = Db::connect();
-            $stmt = $db->prepare('insert into user (firstname,lastname,username,email,password) 
-                values (:firstname,:lastname,:username,:email,:password)');
-            $stmt->bindValue('firstname', $firstName);
-            $stmt->bindValue('lastname', $lastName);
-            $stmt->bindValue('username', $username);
-            $stmt->bindValue('email', $email);
-            $stmt->bindValue('password', password_hash($password, PASSWORD_BCRYPT));
-            if ($stmt->execute()) {
-                Session::getInstance()->addMessage('You registered successfuly', 'success');
-                header("Location: " . App::config('url') . 'login');
-            } else {
+            $user = new User($db);
+            $user->addUser($firstName, $lastName, $userName, $email, $address, $password);
+            if (!$user) {
                 Session::getInstance()->addMessage('Something went wrong try again', 'info');
                 header("Location: " . App::config('url') . 'registration');
+            } else {
+                Session::getInstance()->addMessage('You registered successfuly', 'success');
+                header("Location: " . App::config('url') . 'login');
             }
         } else {
             header("Location: " . App::config('url') . 'registration');
-            
         }
     }
 }

@@ -39,6 +39,24 @@ class User
         }
     }
 
+    public function addUser($firstName, $lastName, $username, $email, $address, $password)
+    {
+        $db = $this->db;
+        $stmt = $db->prepare('insert into user (firstName,lastName,userName,email,address,password) 
+                values (:firstName,:lastName,:userName,:email,:address,:password)');
+        $stmt->bindValue('firstName', $firstName);
+        $stmt->bindValue('lastName', $lastName);
+        $stmt->bindValue('userName', $username);
+        $stmt->bindValue('email', $email);
+        $stmt->bindValue('address', $address);
+        $stmt->bindValue('password', password_hash($password, PASSWORD_BCRYPT));
+        if (!$stmt->execute()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     protected function validate($user)
     {
 
