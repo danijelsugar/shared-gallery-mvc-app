@@ -7,10 +7,13 @@ class ManagementController
         if (!Session::getInstance()->isLoggedIn() && !Session::getInstance()->cookieLoggin()) {
             header('Location: ' . App::config('url'));
         } else {
-            var_dump(Session::getInstance()->getUser()->id);
+            $db = Db::connect();
+            $images = new Image($db);
+            $images = $images->getImages();
+
             $view = new View();
             $view->render('management', [
-                
+                'images' => $images
             ]);
         }
         
@@ -52,5 +55,13 @@ class ManagementController
             Session::getInstance()->addMessage('Choose image to upload', 'warning');
             header('Location: ' . App::config('url') . 'management');
         }
+    }
+
+    public function removeImage($id)
+    {
+        echo 'remove' . $id;
+        $db = Db::connect();
+        $remove = new Image($db);
+        $remove->deleteImg($id);
     }
 }
