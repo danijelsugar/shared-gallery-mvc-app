@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Shared gallery</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-</head>
-<body>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="<?php echo App::config('url') ?>assets/custom.css">
     
     <nav>
         <ul class="nav nav-tabs justify-content-center">
@@ -45,6 +45,25 @@
         </div>
         
     </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+// A $( document ).ready() block.
+$( document ).ready(function() {
+    $("#numberOfImages").click(function (e) {
+        e.preventDefault();
+        
+        $.ajax({
+            type: "POST",
+            url: "<?php echo App::config('url') ?>home/numberofimages",
+            success: function (data) {
+                console.log(data)
+            }
+        })
+    })
+});
+    
+</script>
+    
 
 
 
