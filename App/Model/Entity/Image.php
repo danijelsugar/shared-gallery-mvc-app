@@ -17,4 +17,22 @@ class Image
         $stmt->bindValue('imgLocation', $name);
         $stmt->execute();
     }
+
+    public function getImages()
+    {
+        $db = $this->db;
+        $stmt = $db->prepare('SELECT a.id, a.user, b.userName, a.name, b.email, b.address, a.imgLocation 
+                        FROM images a 
+                        INNER JOIN user b 
+                            ON a.user=b.id');
+        $stmt->execute();
+        $images = $stmt->fetchAll();
+
+        return $images;
+    }
+
+    public function deleteImg($id)
+    {
+        
+    }
 }
