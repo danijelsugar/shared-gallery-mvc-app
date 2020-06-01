@@ -33,6 +33,19 @@ class Image
 
     public function deleteImg($id)
     {
-        
+        $db = $this->db;
+        $stmt = $db->prepare('DELETE FROM images WHERE id=:id');
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+    }
+
+    public function getImageCount()
+    {
+        $db = $this->db;
+        $stmt = $db->prepare('SELECT count(id) FROM images');
+        $stmt->execute();
+        $imgCount = $stmt->fetchColumn();
+
+        return $imgCount;
     }
 }
