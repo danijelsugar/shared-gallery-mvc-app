@@ -45,24 +45,26 @@
         </div>
         
     </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-// A $( document ).ready() block.
-$( document ).ready(function() {
-    $("#numberOfImages").click(function (e) {
-        e.preventDefault();
-        
-        $.ajax({
-            type: "POST",
-            url: "<?php echo App::config('url') ?>home/numberofimages",
-            success: function (data) {
-                console.log(data)
-            }
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    // A $( document ).ready() block.
+    $( document ).ready(function() {
+        $("#numberOfImages").click(function (e) {
+            e.preventDefault();
+            
+            $.ajax({
+                type: "POST",
+                url: "<?php echo App::config('url') ?>home/numberofimages",
+                success: function (data) {
+                    let jsonData = jQuery.parseJSON(data);
+                    $("#imgCount").text("Total number of images: " + jsonData);
+                }
+            })
         })
-    })
-});
-    
-</script>
+    });
+        
+    </script>
+
     
 
 

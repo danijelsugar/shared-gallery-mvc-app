@@ -12,16 +12,18 @@ class HomeController
     {
         
         $view = new View();
-
-        $posts = [
-            'First post',
-            'Second post'
-        ];
-
         $view->render('home', [
-            "posts" => $posts
+    
         ]);
-        var_dump($_COOKIE);
+    }
+
+    public function numberOfImages()
+    {
+        $db = Db::connect();
+        $image = new Image($db);
+        $image = $image->getImageCount();
+        
+        echo json_encode($image);
     }
 
 }
