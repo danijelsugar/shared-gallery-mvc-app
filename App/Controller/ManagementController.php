@@ -22,12 +22,11 @@ class ManagementController
     public function addImage() {
         if (isset($_FILES['image'])) {
             $targetDir = BP . 'public/uploads/';
-            $name = basename($_FILES['image']['name']);
+            $fileType = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+            $name = substr( base_convert( time(), 10, 36 ) . md5( microtime() ), 0, 16 ) . '.' . $fileType;
             $targetFile = $targetDir . $name;
-            $fileType = pathinfo($targetFile, PATHINFO_EXTENSION);
             $allowedFileTypes = ['jpg','jpeg','png'];
             $valid = true;
-            var_dump($targetFile);
 
             if (!in_array($fileType, $allowedFileTypes)) {
                 $valid = false;
@@ -59,9 +58,11 @@ class ManagementController
 
     public function removeImage($id)
     {
-        echo 'remove' . $id;
+        //todo: delete image from uploads
         $db = Db::connect();
         $remove = new Image($db);
         $remove->deleteImg($id);
+        Session::getInstance()->addMessage('Image deleted successfully');
+        header('Location: ' . App::config('url') . 'management');
     }
 }
