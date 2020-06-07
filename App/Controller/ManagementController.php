@@ -56,13 +56,35 @@ class ManagementController
         }
     }
 
-    public function removeImage($id)
+    public function removeImage(int $id)
     {
-        //todo: delete image from uploads
+        $imgId = $id;
         $db = Db::connect();
-        $remove = new Image($db);
-        $remove->deleteImg($id);
-        Session::getInstance()->addMessage('Image deleted successfully');
-        header('Location: ' . App::config('url') . 'management');
+        $image = new Image($db);
+        $image = $image->findImgById($imgId);
+        $imageName = $image->imgLocation;
+        $targetDir = BP . 'public/uploads/';
+
+        $userId = Session::getInstance()->getUser()->id;
+
+        
+        if ($userId != $image->user) {
+            Session::getInstance()->logout();
+            header('Location: ' . App::config('url'));
+            exit();
+        }
+
+        if (file_exists($targetDir . $imageName)) {
+            if (unlink($targetDir . $imageName)) {
+                $remove = new Image($db);
+                $remove->deleteImg($id);
+                Session::getInstance()->addMessage('Image deleted successfully');
+                header('Location: ' . App::config('url') . 'management');
+            } else {
+                Session::getInstance()->addMessage('Something went wrong, try again', 'warning');
+            }
+        }
+        
+        
     }
 }
