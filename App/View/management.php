@@ -24,7 +24,7 @@
                 <td><?php echo htmlspecialchars($image->userName) ?></td>
                 <td><?php echo htmlspecialchars($image->email) ?></td>
                 <td><?php echo htmlspecialchars($image->address) ?></td>
-                <td class="img"><img src="<?php echo App::config('url') . 'uploads/' . $image->imgLocation ?>" alt="img"></td>
+                <td><img class="img" src="<?php echo App::config('url') . 'uploads/' . $image->imgLocation ?>" alt="img"></td>
                 <?php if (Session::getInstance()->getUser()->id === $image->user): ?>
                 <td>
                     <a class="btn btn-danger" href="<?php App::config('url') ?>management/removeimage/<?php echo $image->id ?>">
