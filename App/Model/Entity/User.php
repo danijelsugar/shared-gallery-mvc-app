@@ -29,6 +29,24 @@ class User
         return $user;
     }
 
+    /**
+     * Find user by id
+     * 
+     * @param int $id user id
+     * 
+     * @return Object
+     */
+    public function findById(int $id)
+    {
+        $db = $this->db;
+        $stmt = $db->prepare('SELECT id, firstName, lastName, userName, address FROM user WHERE id=:id');
+        $stmt->bindValue('id', $id);
+        $stmt->execute();
+        $user = $stmt->fetch();
+
+        return $user;
+    }
+
     public function authenticate($email, $password)
     {
         $user = $this->findByEmail($email);
@@ -50,11 +68,19 @@ class User
         $stmt->bindValue('email', $email);
         $stmt->bindValue('address', $address);
         $stmt->bindValue('password', password_hash($password, PASSWORD_BCRYPT));
-        if (!$stmt->execute()) {
-            return false;
-        } else {
-            return true;
-        }
+        return $stmt->execute();
+    }
+
+    public function editUser($firstName, $lastName, $username, $address)
+    {
+        $db = $this->db;
+        $stmt = $db->prepare('UPDATE user SET firstName=:firstName, lastName=:lastName, userName=:userName, address=:address');
+        $stmt->bindValue('firstName', $firstName);
+        $stmt->bindValue('lastName', $lastName);
+        $stmt->bindValue('userName', $username);
+        $stmt->bindValue('address', $address);
+        return $stmt->execute();
+        
     }
 
     protected function validate($user)
