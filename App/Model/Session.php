@@ -22,6 +22,8 @@ class Session
 
     /**
      * store authorized user data in session so it can be accessed throughout the app
+     * 
+     * @param object $user
      */
     public function login($user)
     {
@@ -55,11 +57,15 @@ class Session
         unset($_SESSION['is_logged_in']);
     }
 
+    /**
+     * Check if user was logged in using cookies
+     *
+     * @return boolean
+     */
     public function cookieLoggin() {
         //cookie expiration time
         $currentTime = time();
         $currentDate = date('Y-m-d H:i:s', $currentTime);
-        $cookieExpirationTime = $currentTime + (30*24*60*60);
 
         //set auth token directive to false
         if (!empty($_COOKIE['user_login']) && !empty($_COOKIE['random_password']) && !empty($_COOKIE['random_selector'])) {

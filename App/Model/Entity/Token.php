@@ -13,12 +13,14 @@ class Token
     /**
      * @param string User id 
      * @param boolean
+     * 
+     * @return boolean|object
      */
     public function getTokenByUserId($id, $expired)
     {
         $id = intval($id);
         $db = $this->db;
-        $stmt = $db->prepare('select * from token_auth where user=:id and isExpired=:isExpired');
+        $stmt = $db->prepare('SELECT * FROM token_auth WHERE user=:id AND isExpired=:isExpired');
         $stmt->bindValue('id', $id); 
         $stmt->bindValue('isExpired', $expired);
         $stmt->execute();

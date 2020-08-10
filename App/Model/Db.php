@@ -5,7 +5,7 @@ class Db extends PDO
 
     private static $instance;
 
-    private function __construct($config)
+    private function __construct(array $config)
     {
 
         try {
