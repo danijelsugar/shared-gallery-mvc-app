@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 //root path
 define('BP', dirname(dirname(__FILE__)) . '/' );
 
 //enabling displaying php errors
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', "1");
+
 
 //path were included classes would be find
 $includePaths = implode(PATH_SEPARATOR, [
