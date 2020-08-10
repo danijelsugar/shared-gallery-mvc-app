@@ -12,8 +12,6 @@ class AccountController
             $user = new User($db);
             $user = $user->findById($userId);
 
-            var_dump($user);
-
             $view = new View();
             $view->render('account', [
                 'user' => $user
@@ -21,7 +19,7 @@ class AccountController
         }
     }
 
-    public function editUser($id)
+    public function editUser()
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             header('Location: '. App::config('url') . 'account');
@@ -33,9 +31,8 @@ class AccountController
             $lastName = isset($_POST['lastName']) ? trim($_POST['lastName']) : '';
             $username = isset($_POST['userName']) ? trim($_POST['userName']) : '';
             $address = isset($_POST['address']) ? trim($_POST['address']) : '';
+            $id = isset($_POST['id']) ? $_POST['id'] : '';
             $valid = true;
-
-            var_dump($_POST);
 
             if ($username === '') {
                 $valid = false;
@@ -45,7 +42,7 @@ class AccountController
             if ($valid) {
                 $db = Db::connect();
                 $user = new User($db);
-                $user->editUser($firstName, $lastName, $username, $address);
+                $user->editUser($firstName, $lastName, $username, $address, $id);
                 if (!$user) {
                     Session::getInstance()->addMessage('Something went wrong try again', 'info');
                     header("Location: " . App::config('url') . 'account');
@@ -57,5 +54,47 @@ class AccountController
                 header('Location: '. App::config('url') . 'account');
             }
         }
+    }
+
+    public function changePassword()
+    {
+        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            header('Location: '. App::config('url') . 'account');
+            exit();
+        }
+
+        if (isset($_POST['changePassword'])) {
+            $db = Db::connect();
+            $user = new User($db);
+            $userPassword = $user->getPasswordById($_POST['id']);
+            $currentPassword = $_POST['currentPassword'];
+
+            $newPassword = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
+            $repeatNewPassword = password_hash($_POST['repeatNewPassword'], PASSWORD_BCRYPT);
+
+            if ($currentPassword === '' || $newPassword === '' || $repeatNewPassword === '') {
+                Session::getInstance()->addMessage('All field are required to change password', 'warning');
+                header('Location: ' . App::config('url') . 'account');
+                exit();
+            }
+
+            if (!$userPassword || !password_verify($currentPassword,$userPassword->password)) {
+                Session::getInstance()->addMessage('Wrong current password', 'warning');
+                header('Location: ' . App::config('url') . 'account');
+                exit();
+            }
+
+            if ($_POST['newPassword'] != $_POST['repeatNewPassword']) {
+                Session::getInstance()->addMessage('New password and repeat password does not match', 'warning');
+                header('Location: ' . App::config('url') . 'account');
+                exit();
+            }
+
+            $user->changePassword($newPassword, $_POST['id']);
+            Session::getInstance()->addMessage('Password changed successfully');
+            header('Location: ' . App::config('url') . 'account');
+            
+        }
+        
     }
 }
