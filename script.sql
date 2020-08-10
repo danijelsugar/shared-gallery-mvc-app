@@ -8,7 +8,7 @@ firstName varchar(50),
 lastName varchar(50),
 userName varchar(50) not null,
 email varchar(100) not null,
-address varchar(100) not null,
+address varchar(100),
 password char(60) not null
 )engine=InnoDB;
 
