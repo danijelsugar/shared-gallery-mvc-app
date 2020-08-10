@@ -22,7 +22,7 @@ class HomeController
         $db = Db::connect();
         $image = new Image($db);
         $image = $image->getImageCount();
-        
+
         echo json_encode($image);
     }
 

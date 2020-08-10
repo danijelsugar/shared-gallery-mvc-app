@@ -60,9 +60,9 @@ class LoginController
                     $userToken = $token->getTokenByUserId($user->id, 0);
 
                     if(!empty($userToken)) {
-                        $setTokenExpired = $token->setTokenExpired($userToken->id);
+                        $token->setTokenExpired($userToken->id);
                     }
-                    $newToken = $token->insertNewToken($user->id, $randomPasswordHash, $randomSelectorHash, $expiryDate);
+                    $token->insertNewToken($user->id, $randomPasswordHash, $randomSelectorHash, $expiryDate);
                 } else {
                      //if user login without remember me checked unset cookies
                      $this->unsetRememberMeCookies();
@@ -85,6 +85,9 @@ class LoginController
         header('Location: ' . App::config('url'));
     }
 
+    /**
+     * Unset remember me cookies
+     */
     protected function unsetRememberMeCookies()
     {
         if(isset($_COOKIE['user_login'])) {
@@ -100,6 +103,12 @@ class LoginController
         }
     }
 
+    /**
+     * Return random generated string
+     *
+     * @param int $length
+     * @return string
+     */
     protected function getToken($length)
     {
         $token = "";
@@ -113,6 +122,13 @@ class LoginController
         return $token;
     }
 
+    /**
+     * Returns random character
+     *
+     * @param int $min
+     * @param int $max
+     * @return int
+     */
     protected function cryptoRandSecure($min, $max)
     {
         $range = $max - $min;

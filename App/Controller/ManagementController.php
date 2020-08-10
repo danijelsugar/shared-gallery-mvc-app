@@ -2,6 +2,10 @@
 
 class ManagementController
 {
+
+    /**
+     * Renders management page
+     */
     public function index()
     {
         if (!Session::getInstance()->isLoggedIn() && !Session::getInstance()->cookieLoggin()) {
@@ -19,6 +23,9 @@ class ManagementController
         
     }
 
+    /**
+     * Add new image to uploads folder and path to database
+     */
     public function addImage() {
         if (isset($_FILES['image'])) {
             $targetDir = BP . 'public/uploads/';
@@ -56,6 +63,11 @@ class ManagementController
         }
     }
 
+    /**
+     * Removes image from uploads folder and database
+     *
+     * @param integer $id
+     */
     public function removeImage(int $id)
     {
         $imgId = $id;
