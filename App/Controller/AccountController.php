@@ -1,28 +1,41 @@
-<?php 
+<?php
+
+namespace Gallery\Controller;
+
+use Gallery\Core\Config;
+use Gallery\Core\Session;
+use Gallery\Core\View;
+use Gallery\Core\Db;
+use Gallery\Core\Request;
+use Gallery\Core\Response;
+use Gallery\Model\User;
 
 class AccountController
 {
-    public function index()
+    public function account(Request $request, Response $response)
     {
-        if (!Session::getInstance()->isLoggedIn() && !Session::getInstance()->cookieLoggin()) {
-            header('Location: ' . App::config('url'));
-        } else {
-            $db = Db::connect();
-            $userId = Session::getInstance()->getUser()->id;
-            $user = new User($db);
-            $user = $user->findById($userId);
-
-            $view = new View();
-            $view->render('account', [
-                'user' => $user
-            ]);
+        if (!Session::getInstance()->isLoggedIn()) {
+            $response->redirect('/');
+            exit();
         }
+
+        $db = Db::connect();
+        $userId = Session::getInstance()->getUser()->id;
+        $user = new User($db);
+        $user = $user->findById($userId);
+
+        $view = new View();
+        $view->render('account/account', [
+            'user' => $user,
+            'url' => Config::get('url'),
+            'sess' => Session::getInstance()
+        ]);
     }
 
-    public function editUser()
+    public function editProfile(Request $request, Response $response)
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: '. App::config('url') . 'account');
+            $response->redirect('/account');
             exit();
         }
 
@@ -32,34 +45,36 @@ class AccountController
             $username = isset($_POST['userName']) ? trim($_POST['userName']) : '';
             $address = isset($_POST['address']) ? trim($_POST['address']) : '';
             $id = isset($_POST['id']) ? $_POST['id'] : '';
-            $valid = true;
+
+            if ($id !== Session::getInstance()->getUser()->id) {
+                $response->redirect('/account');
+                exit();
+            }
 
             if ($username === '') {
-                $valid = false;
                 Session::getInstance()->addMessage('Username required', 'warning');
+                $response->redirect('/account');
+                exit();
             }
 
-            if ($valid) {
-                $db = Db::connect();
-                $user = new User($db);
-                $user->editUser($firstName, $lastName, $username, $address, $id);
-                if (!$user) {
-                    Session::getInstance()->addMessage('Something went wrong try again', 'info');
-                    header("Location: " . App::config('url') . 'account');
-                } else {
-                    Session::getInstance()->addMessage('Successfuly edited your profile', 'success');
-                    header("Location: " . App::config('url') . 'account');
-                }
-            } else {
-                header('Location: '. App::config('url') . 'account');
+            $db = Db::connect();
+            $user = new User($db);
+            $user->editUser($firstName, $lastName, $username, $address, $id);
+
+            if (!$user) {
+                Session::getInstance()->addMessage('Something went wrong try again', 'info');
+                $response->redirect('/account');
             }
+
+            Session::getInstance()->addMessage('Successfuly edited your profile', 'success');
+            $response->redirect('/account');
         }
     }
 
-    public function changePassword()
+    public function changePassword(Request $request, Response $response)
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            header('Location: '. App::config('url') . 'account');
+            $response->redirect('/account');
             exit();
         }
 
@@ -69,32 +84,35 @@ class AccountController
             $userPassword = $user->getPasswordById($_POST['id']);
             $currentPassword = $_POST['currentPassword'];
 
+            if ($_POST['id'] !== Session::getInstance()->getUser()->id) {
+                $response->redirect('/account');
+                exit();
+            }
+
             $newPassword = password_hash($_POST['newPassword'], PASSWORD_BCRYPT);
             $repeatNewPassword = password_hash($_POST['repeatNewPassword'], PASSWORD_BCRYPT);
 
             if ($currentPassword === '' || $newPassword === '' || $repeatNewPassword === '') {
                 Session::getInstance()->addMessage('All field are required to change password', 'warning');
-                header('Location: ' . App::config('url') . 'account');
+                $response->redirect('/account');
                 exit();
             }
 
-            if (!$userPassword || !password_verify($currentPassword,$userPassword->password)) {
+            if (!$userPassword || !password_verify($currentPassword, $userPassword->password)) {
                 Session::getInstance()->addMessage('Wrong current password', 'warning');
-                header('Location: ' . App::config('url') . 'account');
+                $response->redirect('/account');
                 exit();
             }
 
             if ($_POST['newPassword'] != $_POST['repeatNewPassword']) {
                 Session::getInstance()->addMessage('New password and repeat password does not match', 'warning');
-                header('Location: ' . App::config('url') . 'account');
+                $response->redirect('/account');
                 exit();
             }
 
             $user->changePassword($newPassword, $_POST['id']);
             Session::getInstance()->addMessage('Password changed successfully');
-            header('Location: ' . App::config('url') . 'account');
-            
+            $response->redirect('/account');
         }
-        
     }
 }
