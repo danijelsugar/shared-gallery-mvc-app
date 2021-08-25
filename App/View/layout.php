@@ -5,32 +5,32 @@
     <title>Shared gallery</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="<?php echo App::config('url') ?>assets/css/custom.css">
+    <link rel="stylesheet" href="<?php echo $url ?>assets/css/custom.css">
     
     <nav>
         <ul class="nav nav-tabs justify-content-center">
             <li class="nav-item">
-                <a class="nav-link" href="<?php echo App::config('url'); ?>">Home</a>
+                <a class="nav-link" href="<?php echo $url; ?>">Home</a>
             </li>
-            <?php if (Session::getInstance()->isLoggedIn() || Session::getInstance()->cookieLoggin()): ?>
+            <?php if ($sess->isLoggedIn()): ?>
             <li class="nav-item">
-                <a class="nav-link" href="<?php echo App::config('url') ?>management">Management</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="<?php echo App::config('url') ?>account">My account</a>
+                <a class="nav-link" href="<?php echo $url ?>management">Management</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="<?php echo App::config('url') ?>login/logout">Logout</a>
+                <a class="nav-link" href="<?php echo $url ?>account">My account</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?php echo $url ?>logout">Logout</a>
             </li>
             <?php else: ?>
             <li class="nav-item">
-                <a class="nav-link" href="<?php echo App::config('url') ?>login">Login</a>
+                <a class="nav-link" href="<?php echo $url ?>login">Login</a>
             </li>
             <?php endif; ?>
         </ul>
     </nav>
     <?php 
-        $messages = Session::getInstance()->getMessage();
+        $messages = $sess->getMessage();
     ?>    
     <div class="container">
         <?php if (isset($messages)): ?>
@@ -56,7 +56,7 @@
             
             $.ajax({
                 type: "POST",
-                url: "<?php echo App::config('url') ?>home/numberofimages",
+                url: "<?php echo $url ?>number-of-images",
                 success: function (data) {
                     let jsonData = jQuery.parseJSON(data);
                     $("#imgCount").text("Total number of images: " + jsonData);
@@ -66,10 +66,5 @@
     });
         
     </script>
-
-    
-
-
-
 </body>
 </html>
